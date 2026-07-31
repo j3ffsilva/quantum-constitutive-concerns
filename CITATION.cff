@@ -1,0 +1,26 @@
+cff-version: 1.2.0
+message: "If you use this artifact, please cite the associated paper and this software."
+title: "Quantum Constitutive Concerns"
+type: software
+version: 1.0.0
+license: MIT
+repository-code: "https://github.com/j3ffsilva/quantum-constitutive-concerns"
+authors:
+  - family-names: Silva
+    given-names: Jefferson de Oliveira
+    email: jefferson.oliveira@prof.inteli.edu.br
+  - family-names: Ferreira
+    given-names: Bryan Kano
+    email: bryan.ferreira@prof.inteli.edu.br
+  - family-names: Carvalho
+    given-names: Murilo Zanini de
+    email: murilo.zanini@prof.inteli.edu.br
+  - family-names: Iegawa
+    given-names: Fabiana Naomi
+    email: fabiana.iegawa@prof.inteli.edu.br
+keywords:
+  - quantum software engineering
+  - aspect-oriented programming
+  - error mitigation
+  - backend adaptation
+  - reproducibility

@@ -1,0 +1,64 @@
+# Temporários LaTeX
+out/
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.synctex.gz
+*.toc
+*.lof
+*.lot
+*.idx
+*.ind
+*.ilg
+*.glo
+*.gls
+*.acn
+*.acr
+*.alg
+*.bcf
+*.run.xml
+*.nav
+*.snm
+*.vrb
+*.out
+
+# Log de compilação (mantemos apenas o movido para a raiz)
+*.log
+
+# PDF gerado (mantemos apenas o movido para a raiz)
+*.pdf
+
+# Exceções: artefatos finais na raiz são versionados
+!main.pdf
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Editores
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# Diretórios de saída alternativos
+build/
+dist/
+
+# Notas e levantamentos temporários (não fazem parte do artigo)
+tmp/
+
+.claude/
+.venv/
+.cache/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# Private editorial material; never publish with the artifact.
+acceptance-notification.txt

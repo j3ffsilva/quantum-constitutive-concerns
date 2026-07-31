@@ -1,0 +1,35 @@
+{
+  "logical": {
+    "depth": 9,
+    "operations": {
+      "cz": 2,
+      "h": 6,
+      "x": 8
+    },
+    "size": 16
+  },
+  "parameters": {
+    "backend": "fake_fez",
+    "backend_version": "1.2.8",
+    "optimization_level": 3,
+    "seed_transpiler": 6,
+    "target": 0
+  },
+  "native": {
+    "depth": 8,
+    "logical_output_qubits": [
+      23,
+      22
+    ],
+    "operations": {
+      "cz": 2,
+      "rz": 5,
+      "sx": 6
+    },
+    "size": 13
+  },
+  "versions": {
+    "qiskit": "2.4.2",
+    "qiskit_ibm_runtime": "0.47.0"
+  }
+}

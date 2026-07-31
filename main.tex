@@ -1,0 +1,341 @@
+% This repository bundles the ACM-like acmart.cls distributed in the official
+% CBSoft 2026 author kit, not the original upstream ACM_SigConf class.
+\documentclass[sigconf]{acmart}
+
+\usepackage[T1]{fontenc}
+\usepackage[brazilian]{babel}
+
+% The CBSoft 2026 template intentionally omits the ACM reference block and CCS
+% concepts. The corresponding acmart warnings are therefore expected.
+\settopmatter{printacmref=false}
+\renewcommand\footnotetextcopyrightpermission[1]{}
+\setcopyright{none}
+
+\acmConference[WQSE 2026]{1st Brazilian Workshop on Quantum Software Engineering}{September 11, 2026}{São Paulo, SP, Brazil}
+
+\AtBeginDocument{
+  \providecommand\BibTeX{{Bib\TeX}}
+}
+
+%% Português
+\renewcommand\abstractname{Resumo}
+\renewcommand\keywordsname{Palavras-chave}
+\renewcommand\refname{Referências}
+
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\newtheorem{definition}{Definição}
+\renewcommand{\lstlistingname}{Listagem}
+\captionsetup[lstlisting]{justification=justified,singlelinecheck=false}
+
+% Expansão automática de fonte do microtype (herdada do acmart) falha com
+% pdfTeX em certas quebras de linha por usar fontes não escaláveis (cmtt) em
+% \texttt; desabilitamos apenas a expansão, mantendo a protrusão de margem.
+\microtypesetup{expansion=false}
+% Dá ao TeX uma pequena margem adicional para encontrar boas quebras em
+% colunas estreitas, evitando linhas que ultrapassem a margem.
+\setlength{\emergencystretch}{2em}
+
+\lstset{
+  language=Python,
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{blue!70!black},
+  commentstyle=\color{gray},
+  stringstyle=\color{orange!80!black},
+  frame=single,
+  breaklines=true,
+  captionpos=b,
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  xleftmargin=1.5em
+}
+
+\begin{document}
+
+\title{Além da Ortogonalidade: Preocupações Constitutivas em Software Quântico}
+\subtitle{Beyond Orthogonality: Constitutive Concerns in Quantum Software}
+
+\author{Jefferson de Oliveira Silva}
+\email{jefferson.oliveira@prof.inteli.edu.br}
+\affiliation{
+  \institution{Instituto de Tecnologia e Liderança (Inteli)}
+  \institution{Pontifícia Universidade Católica de São Paulo (PUC-SP)}
+  \city{São Paulo}
+  \country{Brazil}
+}
+
+\author{Bryan Kano Ferreira}
+\email{bryan.ferreira@prof.inteli.edu.br}
+\affiliation{
+  \institution{Instituto de Tecnologia e Liderança (Inteli)}
+  \city{São Paulo}
+  \country{Brazil}
+}
+
+\author{Murilo Zanini de Carvalho}
+\email{murilo.zanini@prof.inteli.edu.br}
+\affiliation{
+  \institution{Instituto de Tecnologia e Liderança (Inteli)}
+  \city{São Paulo}
+  \country{Brazil}
+}
+
+\author{Fabiana Naomi Iegawa}
+\email{fabiana.iegawa@prof.inteli.edu.br}
+\affiliation{
+  \institution{Instituto de Tecnologia e Liderança (Inteli)}
+  \city{São Paulo}
+  \country{Brazil}
+}
+
+\renewcommand{\shortauthors}{Silva et al.}
+\renewcommand{\shorttitle}{Além da Ortogonalidade}
+
+\begin{abstract}
+Programas quânticos podem misturar lógica algorítmica e decisões de execução, como mitigação de erros e adaptação de \textit{hardware}. A programação orientada a aspectos oferece mecanismos para modularizar preocupações transversais, mas essa modularização, por si só, não indica quando sua ausência inviabiliza a execução ou compromete o resultado. Definimos uma preocupação transversal como constitutiva quando, em relação a um circuito, \textit{backend}, condições de ruído, distribuição alvo e limiar de validade, sua remoção impede a execução ou produz resultado abaixo do limiar. Ilustramos a definição em dois casos reproduzíveis. Em uma simulação de Grover com três \textit{qubits} e ruído derivado do \textit{snapshot} \texttt{FakeFez}, a extrapolação para ruído zero elevou a fidelidade da distribuição de $0{,}953$ para $0{,}977$, acima do limiar de $0{,}97$. Na adaptação de \textit{backend}, um circuito de Grover com dois \textit{qubits} e 16 operações lógicas resultou em uma representação com 13 operações nativas após a transpilação para o mesmo alvo. Os casos exemplificam constitutividade do resultado e da executabilidade. Analisamos ainda sua composição com preocupações cuja remoção preserva a executabilidade e o critério de validade, mostrando que a ordem das transformações pode produzir circuitos operacionalmente distintos sob ruído. Por fim, derivamos requisitos para a composição, a implementação e a validação empírica dessas preocupações.
+\end{abstract}
+
+\keywords{Computação Quântica, Engenharia de Software Quântico, Programação Orientada a Aspectos, Preocupações Constitutivas, Mitigação de Erros Quânticos}
+
+\frenchspacing
+\maketitle
+
+\section*{Abstract}
+Quantum programs may mix algorithmic logic with execution decisions such as error mitigation and hardware adaptation. Aspect-oriented programming provides mechanisms for modularizing crosscutting concerns, but this modularization alone does not indicate when their absence prevents execution or compromises the result. We define a crosscutting concern as constitutive when, relative to a circuit, backend, noise conditions, target distribution, and validity threshold, removing it prevents execution or produces a result below the threshold. We illustrate the definition through two reproducible cases. In a three-qubit Grover simulation using noise derived from the \texttt{FakeFez} snapshot, zero-noise extrapolation increased distribution fidelity from $0.953$ to $0.977$, above the $0.97$ threshold. For backend adaptation, a two-qubit Grover circuit containing 16 logical operations resulted in a representation with 13 native operations after transpilation to the same target. The cases illustrate concerns constitutive of result validity and executability. We also analyze their composition with concerns whose removal preserves executability and the validity criterion, showing that transformation order can produce operationally distinct circuits under noise. Finally, we derive requirements for the composition, implementation, and empirical validation of these concerns.
+
+\noindent\textbf{Keywords:} Quantum Computing, Quantum Software Engineering, Aspect-Oriented Programming, Constitutive Concerns, Quantum Error Mitigation
+
+% ============================================================
+\section{Introdução}
+% ============================================================
+
+\textit{Frameworks} como Qiskit~\cite{qiskit2023} e PennyLane~\cite{bergholm2022} reduziram a barreira para escrever programas quânticos ao oferecer interfaces de programação de aplicações (APIs) que abstraem parte dos detalhes físicos do processador e permitem executar algoritmos em \textit{hardware} acessível pela nuvem. Essa abstração simplifica o acesso ao dispositivo, mas não determina como organizar no código as decisões que dependem dele. Mitigação de erros, escolha de \textit{backend} e transpilação ainda precisam ser coordenadas com a lógica algorítmica, o que cria um problema distinto de separação de responsabilidades.
+
+A necessidade dessa separação decorre, em parte, das condições do regime de escala intermediária e ruidosa (\textit{Noisy Intermediate-Scale Quantum}, NISQ), caracterizado por \textit{qubits} físicos sujeitos a ruído e pela ausência de computação tolerante a falhas em larga escala~\cite{preskill2018}. Escrever um circuito com a lógica correta não é suficiente. O desenvolvedor precisa decidir como mitigar ruído, adaptar o circuito às operações suportadas pelo \textit{hardware} alvo e orquestrar múltiplas execuções para obter estimativas válidas. Essas decisões pertencem à execução, não à lógica do circuito, mas essas APIs permitem expressá-las no mesmo fluxo de código. Essa possibilidade motiva uma investigação sistemática de como separar e classificar tais decisões.
+
+A programação orientada a aspectos (\textit{Aspect-Oriented Programming}, AOP) separa preocupações transversais em módulos declarativos~\cite{kiczales1997}. No domínio quântico, contudo, o modelo de composição não indica quais preocupações são necessárias para a executabilidade ou para satisfazer um critério quantitativo de validade no ambiente alvo. Argumentamos que certas preocupações de execução de \textit{software} quântico exigem essa distinção. Em determinado contexto, sua remoção pode deixar o circuito sem uma representação executável no \textit{hardware} alvo ou fazer a execução ruidosa produzir um resultado abaixo do critério exigido. Propomos o conceito de \textbf{preocupação constitutiva} para descrever essa categoria. O termo remete às \emph{equações constitutivas} da física do contínuo, que complementam leis gerais com relações específicas do material.\footnote{Em mecânica do contínuo, as leis de conservação não determinam, por si sós, o comportamento de um material. Relações constitutivas, como as leis de Hooke, Ohm e Fourier, descrevem esse comportamento ao relacionar, respectivamente, tensão e deformação, corrente e campo elétrico, e fluxo de calor e gradiente de temperatura~\cite{truesdell2004}.} De modo análogo, uma preocupação constitutiva complementa a lógica do circuito com um procedimento necessário no ambiente de execução.
+
+Este artigo apresenta as seguintes contribuições: (1)~uma definição formal de preocupação constitutiva baseada na executabilidade e em um critério quantitativo contextual de validade; (2)~dois casos ilustrativos: mitigação de erros via extrapolação a ruído zero (\textit{Zero-Noise Extrapolation}, ZNE) e adaptação de \textit{backend}; (3)~uma análise da composição entre preocupações ortogonais ao critério de executabilidade e validade e preocupações constitutivas, quanto à ordem de aplicação, à verificação e à exploração de combinações; e (4)~uma agenda de formalização e validação da taxonomia proposta.
+
+O restante deste artigo está organizado da seguinte forma. A Seção~\ref{sec:background} apresenta os fundamentos de AOP e computação quântica. A Seção~\ref{sec:constitutive} formaliza o conceito de preocupação constitutiva. A Seção~\ref{sec:catalog} descreve os dois casos ilustrativos. A Seção~\ref{sec:composition} analisa a composição entre preocupações ortogonais e constitutivas. A Seção~\ref{sec:related} discute trabalhos relacionados. A Seção~\ref{sec:conclusion} conclui com uma agenda de pesquisa.
+
+% ============================================================
+\section{Fundamentos}
+\label{sec:background}
+% ============================================================
+
+AOP separa preocupações transversais, como controle de acesso, \textit{logging} e monitoramento, em unidades chamadas aspectos. Um aspecto define pontos de junção (\textit{join points}), adiciona comportamento antes ou depois deles (\textit{advice}) e é tecido (\textit{woven}) ao programa em tempo de compilação ou execução~\cite{kiczales1997}. Por exemplo, o decorador hipotético \texttt{@ManagersOnly} poderia representar um aspecto de controle de acesso aplicado ao método \texttt{deposit()}, restringindo quem pode invocar a operação sem alterar o saldo calculado. Aspectos podem ser relevantes para a correção de um sistema clássico. O modelo de composição, contudo, não os classifica segundo sua necessidade para executar o programa ou satisfazer um limiar quantitativo de validade. A Seção~\ref{sec:constitutive} introduz essa distinção para o domínio quântico.
+
+Um \textit{qubit} é um vetor unitário em $\mathbb{C}^2$, $\alpha|0\rangle + \beta|1\rangle$, com $|\alpha|^2 + |\beta|^2 = 1$. Portas quânticas são transformações unitárias, como $H$ (Hadamard, usada para criar superposição a partir de $|0\rangle$ ou $|1\rangle$), $X$ (análoga ao NOT clássico) e $CZ$ (fase condicional entre dois \textit{qubits}, capaz de gerar entrelaçamento dependendo do estado de entrada). Um circuito quântico é uma sequência dessas portas aplicada a um registrador. Na medição na base computacional, a regra de Born associa a cada cadeia de bits a probabilidade dada pelo módulo quadrado de sua amplitude~\cite{nielsen2010}. Para um único \textit{qubit} no estado $\alpha|0\rangle+\beta|1\rangle$, as probabilidades são $|\alpha|^2$ e $|\beta|^2$. Como a medição é estocástica, o circuito é executado múltiplas vezes (\textit{shots}) para estimar a distribuição de resultados; dependendo do algoritmo, interessa o valor mais frequente, um valor esperado ou a distribuição inteira.
+
+As distribuições estimadas por essas execuções também são afetadas pelo ruído do dispositivo. No regime NISQ, os \textit{qubits} físicos são sensíveis a perturbações ambientais, que causam decoerência, e os erros das operações dependem do dispositivo e de suas condições de calibração. Circuitos mais profundos tendem a acumular mais erros e degradar os resultados. ZNE~\cite{temme2017} é uma técnica de mitigação de erros quânticos: o ruído é amplificado em escalas controladas e os resultados são extrapolados para o limite de ruído zero, sem \textit{qubits} adicionais.
+
+Além de lidar com o ruído, executar um circuito em um dispositivo específico exige adaptar sua representação às operações e à topologia disponíveis. Circuitos são escritos com portas lógicas abstratas, mas cada \textit{chip} quântico suporta apenas um conjunto nativo de operações. O IBM Fez (Heron r2) opera com $\{CZ, RZ, SX, X\}$~\cite{ibmquantum2024}; uma porta $H$ precisa ser decomposta nessa família. Além disso, a topologia do \textit{chip} determina quais \textit{qubits} físicos podem interagir diretamente. Quando a lógica exige interação entre \textit{qubits} não adjacentes, operações de roteamento, como SWAP, podem ser inseridas pelo transpilador, aumentando a profundidade e o erro acumulado. O mesmo circuito lógico produz circuitos nativos distintos dependendo do \textit{backend} alvo. Embora compilações clássicas também possam apresentar diferenças dependentes da plataforma, por exemplo em aritmética de ponto flutuante, na transpilação quântica a seleção de portas, o mapeamento e o ruído do dispositivo influenciam a distribuição observada.
+
+% ============================================================
+\section{Preocupações Constitutivas}
+\label{sec:constitutive}
+% ============================================================
+
+A Listagem~\ref{lst:grover} apresenta, em notação Python inspirada na API do Qiskit, uma forma declarativa de separar a lógica do algoritmo de Grover~\cite{grover1996} das decisões de execução. O corpo da função expressa apenas a lógica do circuito; as decisões de mitigação e adaptação de \textit{hardware} são representadas pelos decoradores.
+
+\begin{lstlisting}[float=tbp, caption={Notação proposta para separar a lógica do circuito de preocupações de execução.}, label={lst:grover}]
+@ErrorMitigation(strategy="ZNE", scale_factors=[1, 2, 3])
+@BackendAdapt(target="ibm_fez", optimization_level=3)
+def grover_search(target: int):
+    qc = QuantumCircuit(2)
+    qc.h(0); qc.h(1)
+    for q in range(2):
+        if not (target & (1 << q)): qc.x(q)
+    qc.cz(0, 1)
+    for q in range(2):
+        if not (target & (1 << q)): qc.x(q)
+    qc.h(0); qc.h(1); qc.x(0); qc.x(1)
+    qc.cz(0, 1)
+    qc.x(0); qc.x(1); qc.h(0); qc.h(1)
+    return qc
+\end{lstlisting}
+
+Os decoradores usados neste artigo, incluindo \texttt{@ManagersOnly}, \texttt{@ErrorMitigation}, \texttt{@BackendAdapt}, \texttt{@Logging}, \texttt{@CostMonitor} e \texttt{@Explore}, constituem uma notação conceitual, e não APIs existentes do Qiskit ou de outro \textit{framework}. Empregamos a sintaxe de decoradores Python por sua familiaridade e por explicitar a separação declarativa proposta. O artefato reproduz as transformações e os experimentos subjacentes; sua integração em um \textit{framework} de decoradores poderá oferecer diretamente essa interface sobre SDKs quânticos.
+
+A notação torna a separação visível, mas não determina se cada preocupação pode ser removida sem comprometer a executabilidade ou a validade do resultado. Para responder a essa questão, precisamos primeiro definir o que constitui um resultado válido em determinado contexto de execução.
+
+\begin{definition}[Validade Semântica]
+\label{def:semantic-validity}
+Seja $Q$ um circuito quântico e $\mathcal{E}(Q;B,\eta_B)$ um procedimento de execução ou estimação que retorna uma distribuição de probabilidade no \textit{backend} $B$ sob condições de ruído descritas por $\eta_B$. Dadas uma distribuição alvo $\mathcal{D}^*$, uma função de fidelidade $F$ e uma tolerância $0<\tau\leq1$ fixada pelo caso de uso, o procedimento é semanticamente válido em relação a $(Q,B,\eta_B,\mathcal{D}^*,\tau)$ se $F(\mathcal{E}(Q;B,\eta_B),\mathcal{D}^*)\geq\tau$.
+\end{definition}
+
+Adotamos a fidelidade clássica entre distribuições, $F(P,R)=(\sum_i\sqrt{P_iR_i})^2$, cujo valor máximo é 1. Outras métricas também são compatíveis com a Definição~\ref{def:semantic-validity}. Para algoritmos em que o critério de sucesso é um valor esperado, $F$ pode ser substituída por uma função de adequação na qual valores maiores indicam melhores resultados. Se for empregada uma distância $\Delta$, a condição deve ser escrita como $\Delta(\mathcal{E}(Q;B,\eta_B),\mathcal{D}^*)\leq\tau_\Delta$. O descritor $\eta_B$ pode representar vários parâmetros e variar ao longo do tempo; ele não pressupõe um único parâmetro escalar de ruído.
+
+Neste trabalho, os termos \emph{transversal} e \emph{constitutiva} respondem a perguntas distintas. O primeiro qualifica a distribuição da preocupação na decomposição do programa; o segundo, a consequência de removê-la em um contexto de execução. Nesse segundo eixo, uma preocupação transversal pode ser ortogonal ao critério de executabilidade e validade ou constitutiva em relação a esse critério.
+
+Uma preocupação transversal é ortogonal ao critério no contexto $(Q,B,\eta_B,\mathcal{D}^*,\tau)$ quando sua remoção preserva a executabilidade e a validade, ainda que possa alterar estrutura, custo ou comportamento observável. A classificação, portanto, não decorre da sintaxe do decorador nem da ausência de efeitos sobre o programa, mas da consequência de sua remoção sobre o critério definido.
+
+\begin{definition}[Preocupação Constitutiva]
+\label{def:constitutive-concern}
+Uma preocupação transversal $C$ é \emph{constitutiva} em relação a $(Q,B,\eta_B,\mathcal{D}^*,\tau)$ se o procedimento com a preocupação, $\mathcal{E}_C$, é executável e satisfaz $F(\mathcal{E}_C(Q;B,\eta_B),\mathcal{D}^*)\geq\tau$. Sua remoção resulta em um procedimento $\mathcal{E}_{-C}$ que \emph{(a)} não é executável em $B$; ou \emph{(b)} é executável, mas satisfaz $F(\mathcal{E}_{-C}(Q;B,\eta_B),\mathcal{D}^*)<\tau$.
+\end{definition}
+
+A mitigação de erros via ZNE ilustra a condição~(b). A listagem emprega 2 \textit{qubits} para manter concisa a apresentação da notação. A avaliação de ZNE emprega uma busca de Grover sobre 3 \textit{qubits} (2 iterações, oráculo e difusor com porta Toffoli, ou $CCX$). Após a transpilação, o circuito contém 191 operações na base nativa, o que permite comparar os procedimentos sob os efeitos do modelo de ruído em relação ao limiar adotado\footnote{Simulação realizada no \texttt{qiskit-aer} com o modelo de ruído do \texttt{FakeFez} (\texttt{qiskit-ibm-runtime}), sem execução em um processador quântico físico. Foram usados 32.768 \textit{shots} por escala, semente de transpilação 6 e sementes de simulação 54.321, 54.322 e 54.323. O \textit{folding} global do Mitiq~\cite{larose2022}, com fatores nominais $[1,2,3]$, resultou em circuitos com 191, 815 e 881 operações na base nativa. Os fatores indicam o nível de \textit{folding}, não múltiplos exatos da contagem de operações ou do ruído físico. As probabilidades foram extrapoladas individualmente com \texttt{numpy.polyfit}.}. Para este exemplo, adotamos $\tau=0{,}97$. Sob o mesmo $\eta_B$, $\mathcal{E}_{-C}$ retorna $F\approx0{,}953$, enquanto $\mathcal{E}_C$ retorna $F\approx0{,}977$ após ZNE; o simulador sem ruído fornece a distribuição de referência. A distribuição mitigada é construída extrapolando separadamente cada probabilidade, truncando valores negativos e normalizando o vetor. Assim, $0{,}953<\tau\leq0{,}977$. A extrapolação direta da fidelidade produziria $F\approx0{,}987$, mas é apenas diagnóstica: exige acesso à distribuição ideal e não reconstrói uma distribuição de saída.
+
+A adaptação de \textit{backend} ilustra a condição~(a). O circuito da Listagem~\ref{lst:grover} utiliza a porta $H$, que não pertence ao conjunto nativo do IBM Fez. Sem a transformação representada por \texttt{@BackendAdapt}, seja ela invocada explicitamente ou realizada de modo implícito pela plataforma, o circuito não pode ser executado no \textit{backend} alvo; o problema é realizabilidade física, não otimização.
+
+Os exemplos anteriores também ajudam a delimitar o alcance do conceito. Preocupação constitutiva não é sinônimo de requisito de execução. Um requisito é uma precondição e não diz, por si só, como modularizar o procedimento que o satisfaz. Preocupações de categorias semânticas distintas podem ser expressas pelo mesmo mecanismo sintático. As Listagens~\ref{lst:grover} e~\ref{lst:composition} representam preocupações constitutivas e ortogonais como decoradores, mas a sintaxe não codifica a consequência de removê-las. A classificação torna explícita a relação de cada preocupação com a executabilidade ou com um critério operacional de validade.
+
+A Tabela~\ref{tab:concerns} sintetiza esse critério e mostra que alterações estruturais ou múltiplas execuções, isoladamente, não determinam a classificação.
+
+\begin{table*}[t]
+  \caption{Classificação relativa de preocupações transversais ortogonais ao critério e constitutivas. Alterações estruturais e número de execuções não determinam a categoria.}
+  \label{tab:concerns}
+  \begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}lll}
+    \toprule
+    \textbf{Dimensão} & \textbf{Ortogonal ao Critério} & \textbf{Preocupação Constitutiva} \\
+    \midrule
+    Consequência da remoção & Preserva execução e limiar & Viola execução ou limiar \\
+    Dependência de contexto & Relativa a $Q,B,\eta_B,\mathcal{D}^*,\tau$ & Relativa aos mesmos elementos \\
+    Estrutura do circuito   & Pode ser alterada          & Pode ser alterada \\
+    Número de execuções     & Uma ou mais                & Uma ou mais \\
+    Papel da classificação & Opcional para o critério    & Necessária para o critério \\
+    \bottomrule
+  \end{tabular*}
+\end{table*}
+
+% ============================================================
+\section{Instâncias de Preocupações Constitutivas}
+\label{sec:catalog}
+% ============================================================
+
+A seção anterior empregou os dois casos para ilustrar as condições da Definição~\ref{def:constitutive-concern}. Nesta seção, detalhamos a intenção, a interface declarativa e a sequência de transformações de cada preocupação. Sua classificação continua baseada na consequência da remoção, e não na sintaxe do decorador.
+
+\subsection{Instância 1: Mitigação de Erros}
+
+A notação \texttt{@ErrorMitigation} representa um procedimento de estimação que separa a mitigação de erros da lógica do circuito. No contexto avaliado, esse procedimento permite satisfazer o critério de validade definido para a execução ruidosa.
+
+Na abstração proposta, \texttt{@ErrorMitigation} recebe \texttt{strategy}, que seleciona o método de mitigação, como ZNE, cancelamento probabilístico de erros (\textit{Probabilistic Error Cancellation}, PEC) ou regressão baseada em dados de circuitos (\textit{Clifford Data Regression}, CDR). Quando a estratégia selecionada é ZNE, \texttt{scale\_factors} especifica as escalas nominais empregadas na extrapolação. Para a estratégia ZNE executada no artefato:
+
+\begin{enumerate}
+  \item O circuito base é transpilado para o conjunto de portas nativas do \textit{backend}.
+  \item O circuito de escala $\lambda=1$ permanece inalterado. Para $\lambda>1$, o \textit{folding} global é aplicado ao circuito transpilado, inserindo pares inversos $U^\dagger U$ no circuito inteiro e, quando necessário, em uma fração dele, preservando a unidade ideal enquanto amplia nominalmente o ruído~\cite{giurgica2020}.
+  \item As operações inversas introduzidas pelo \textit{folding} são traduzidas novamente para a base nativa, sem otimizações que poderiam cancelar os pares inseridos.
+  \item Um circuito é executado independentemente para cada fator de escala, com o número configurado de \textit{shots}.
+  \item Para cada resultado, suas probabilidades nas diferentes escalas são ajustadas por um modelo linear em $\lambda$, avaliado em $\lambda=0$. Os valores negativos são truncados, e o vetor resultante é normalizado para formar a distribuição mitigada.
+\end{enumerate}
+
+O argumento segue da Definição~\ref{def:constitutive-concern}, condição~(b). No exemplo, $\mathcal{E}_{-C}$ não satisfaz o limiar, enquanto $\mathcal{E}_C$ constrói, a partir das distribuições nas três escalas, uma estimativa que o satisfaz sob o mesmo $\eta_B$. Os circuitos escalonados constituem execuções adicionais introduzidas exclusivamente pelo procedimento de mitigação. Sem as distribuições obtidas nessas escalas, não é possível construir a estimativa que, nesta instância, satisfaz o limiar. A preocupação é, portanto, constitutiva do resultado.
+
+\subsection{Instância 2: Adaptação de \textit{Backend}}
+
+A notação \texttt{@BackendAdapt} representa a transformação da representação do circuito para o \textit{backend} selecionado, sem alterar a computação lógica pretendida.
+
+Na abstração proposta, \texttt{@BackendAdapt} recebe \texttt{target}, o identificador do \textit{backend}, e \texttt{optimization\_level}, que define o nível de otimização empregado na transpilação (0 a 3). A transformação compreende:
+
+\begin{enumerate}
+  \item \textbf{Decomposição de portas:} portas lógicas não suportadas pelo \textit{backend} são decompostas em operações nativas. Para o IBM Fez, com conjunto $\{CZ, RZ, SX, X\}$, $CZ$ já é nativa; $H$ é equivalente, salvo fase global, a uma composição de $RZ$ e $SX$. Para \texttt{target=0}, as 16 operações lógicas da Listagem~\ref{lst:grover} resultam em 13 operações na base nativa após otimização\footnote{Com Qiskit~2.4, \texttt{FakeFez}, \texttt{optimization\_level=3} e semente de transpilação 6, o circuito transpilado contém seis operações \texttt{sx}, cinco \texttt{rz} e duas \texttt{cz}. A contagem considera instruções do circuito transpilado; uma operação \texttt{rz} pode corresponder a uma rotação virtual.}.
+  \item \textbf{Mapeamento de \textit{qubits}:} \textit{qubits} lógicos são mapeados a \textit{qubits} físicos selecionados segundo a conectividade e as propriedades de calibração registradas no alvo.
+  \item \textbf{Roteamento:} quando a lógica exige interação entre \textit{qubits} físicos não adjacentes, operações SWAP podem ser inseridas. Uma SWAP equivale logicamente a três portas $CX$ (controlled-$X$), que ainda precisam ser decompostas caso não pertençam à base nativa.
+  \item \textbf{Otimização:} sequências redundantes são canceladas; portas $RZ$ adjacentes são fundidas; portas $RZ(0)$ são eliminadas.
+\end{enumerate}
+
+O argumento de constitutividade segue da Definição~\ref{def:constitutive-concern}, condição~(a): sem a transformação representada por \texttt{@BackendAdapt}, o circuito contém instruções que não pertencem ao conjunto aceito pelo dispositivo alvo. O problema não é apenas a qualidade da otimização, mas a ausência de uma representação executável naquele \textit{backend}. Embora essa transformação corresponda a uma etapa de compilação, tratá-la como preocupação declarativa permite reconfigurar o alvo para o mesmo corpo algorítmico e reutilizar a decisão em diferentes algoritmos; outro \textit{backend} pode produzir uma representação nativa diferente.
+
+\subsection{Taxonomia Preliminar}
+
+As duas instâncias ilustram modos distintos de constitutividade. A mitigação de erros é constitutiva do \textit{resultado} no contexto avaliado: sem ela, $\mathcal{E}_{-C}$ não satisfaz $\tau$. A adaptação de \textit{backend} é constitutiva da \textit{executabilidade}: sem ela, a computação não pode ocorrer no alvo. Essa distinção sugere pelo menos duas categorias. O orçamento de \textit{shots} e outras configurações de execução são candidatos a novas instâncias, cuja classificação dependerá de sua relação com a executabilidade ou com o critério de validade.
+
+% ============================================================
+\section{Composição de Preocupações Ortogonais ao Critério e Constitutivas}
+\label{sec:composition}
+% ============================================================
+
+As seções anteriores trataram preocupações ortogonais ao critério e constitutivas isoladamente. Na prática, o fluxo de execução de um circuito quântico pode combinar ambas:
+
+\begin{lstlisting}[float=tbp, caption={Composição de preocupações ortogonais e constitutivas via decoradores.}, label={lst:composition}]
+# preocupacoes ortogonais
+@Logging(level="INFO")
+@CostMonitor(budget=100)
+# constitutivo do resultado
+@ErrorMitigation(strategy="ZNE",
+                 scale_factors=[1, 2, 3])
+# constitutivo da executabilidade
+@BackendAdapt(target="ibm_fez",
+              optimization_level=3)
+def grover_search(target: int):
+    ...
+\end{lstlisting}
+
+Essa composição suscita três questões para o modelo proposto.
+
+\subsection{A Ordem das Transformações é Semanticamente Relevante}
+
+No AOP clássico, a ordem pode ser relevante quando aspectos interagem, e mecanismos de precedência permitem ordená-los. Esses mecanismos, contudo, não expressam por si sós que determinada ordem é necessária para satisfazer um limiar quantitativo definido pelo domínio. No domínio quântico, a ordem das transformações constitutivas pode alterar o circuito nativo produzido e, sob ruído, a distribuição de saída.
+
+Considerando a ordem das transformações, aplicar a mitigação de erros antes da adaptação de \textit{backend} produz circuitos escalonados em portas lógicas, posteriormente transpilados de forma individual; cada circuito pode resultar em um mapeamento distinto. Aplicar a adaptação de \textit{backend} antes da mitigação, como no experimento deste trabalho, transpila o circuito base uma vez e aplica o \textit{folding} às operações resultantes. Embora preservem a computação lógica ideal, as duas ordens produzem circuitos estruturalmente diferentes e não são operacionalmente equivalentes sob ruído.
+
+Em Python, a expressão com decoradores empilhados é construída de baixo para cima. Na Listagem~\ref{lst:composition}, \texttt{@BackendAdapt} envolve primeiro a função e \texttt{@ErrorMitigation} envolve o resultado. A ordem efetiva das transformações durante uma chamada, porém, depende do protocolo implementado pelos decoradores. A notação precisa, portanto, definir essa semântica explicitamente.
+
+Essa diferença estabelece como requisito uma semântica de composição capaz de representar e verificar restrições de precedência entre preocupações. A política de composição entre preocupações constitutivas, assim como sua interação com preocupações ortogonais, integra a agenda da Seção~\ref{sec:conclusion}.
+
+\subsection{Constitutivos como Restrição de Tipo}
+
+Mecanismos de AOP permitem adicionar e remover aspectos independentemente, mas não registram quais transformações são necessárias para um ambiente alvo. A classificação proposta torna essa necessidade explícita: um circuito sem \texttt{@BackendAdapt} não pode ser executado, e um circuito sem mitigação pode produzir uma distribuição que não satisfaz o limiar de validade.
+
+Isso sugere uma analogia com sistemas de tipos: assim como uma configuração incompatível com as regras de tipo deve ser rejeitada, uma configuração sem as preocupações constitutivas exigidas pelo alvo e pelo critério de validade não deveria ser aceita como válida. A ausência de \texttt{@BackendAdapt} pode impedir a execução, enquanto a ausência de mitigação pode produzir um resultado abaixo do limiar estabelecido. Um \textit{framework} precisaria distinguir preocupações ortogonais de constitutivas. A executabilidade pode admitir verificações estáticas, mas a condição quantitativa depende de $\mathcal{D}^*$, $\eta_B$ e evidência experimental; sua verificação pode exigir contratos, limites analíticos, calibração ou análise dinâmica, e não apenas tipos estáticos.
+
+\subsection{Exploração Automática de Combinações}
+
+A separação entre lógica algorítmica e preocupações constitutivas permite representar a exploração de configurações como uma operação explícita do modelo: dado um algoritmo fixo, um \textit{framework} poderia explorar combinações de \textit{backends} e estratégias de mitigação:
+
+\begin{lstlisting}[float=tbp, caption={Exploração automática de combinações de backend e estratégia de mitigação.}, label={lst:explore}]
+@Explore(
+    backends=["ibm_fez", "ionq_aria"],
+    strategies=["ZNE", "PEC", "CDR"]
+)
+def grover_search(target: int):
+    ...
+\end{lstlisting}
+
+Sem um mecanismo declarativo, a parametrização e a orquestração das seis combinações do exemplo permaneceriam externas ao corpo algorítmico. Com a separação proposta, o \textit{framework} centralizaria essa variabilidade e poderia selecionar a combinação que maximiza $F(\mathcal{E}(Q;B,\eta_B),\mathcal{D}^*)$. A disponibilidade de $\mathcal{D}^*$ é plausível em \textit{benchmarks}, mas não em todo problema de produção; a definição de critérios substitutos integra a agenda de pesquisa.
+
+% ============================================================
+\section{Trabalhos Relacionados}
+\label{sec:related}
+% ============================================================
+
+Na literatura de padrões para \textit{software} quântico, Weigold et al. descrevem soluções recorrentes para codificação, preparação e processamento de dados, como \textit{Angle Encoding}, \textit{Schmidt Decomposition} e \textit{Quantum Phase Estimation}~\cite{weigold2021}. Em um nível arquitetural, Weder et al. modelam aplicações híbridas por meio da orquestração do fluxo de controle e dados e da orquestração do provisionamento da topologia de execução~\cite{weder2021}. Esses trabalhos estruturam algoritmos e aplicações quânticas, enquanto nossa classificação examina preocupações transversais pela consequência de sua remoção.
+
+AspectJulia~\cite{ishimura2024} implementa AOP como um pacote para Julia por meio de metaprogramação e manipulação da árvore sintática abstrata. O trabalho apresenta preocupações como \textit{logging}, \textit{caching} e paralelização em aplicações científicas e de computação de alto desempenho (\textit{High-Performance Computing}, HPC). Essas preocupações não são classificadas em função de um \textit{backend}, uma distribuição alvo e um limiar quantitativo. O presente trabalho acrescenta esse critério contextual.
+
+Na área de mitigação de erros, Mitiq~\cite{larose2022} oferece um conjunto extensível de métodos, incluindo ZNE, PEC e CDR, compatível com diferentes \textit{backends} e \textit{frameworks}. Qermit~\cite{qermit} adota um projeto modular baseado em grafos para compor protocolos e sub-rotinas de mitigação. Esses trabalhos demonstram como procedimentos de mitigação podem ser modularizados e compostos. Nossa análise acrescenta outra questão: em que contexto a remoção de um desses procedimentos viola a executabilidade ou o limiar de validade e, portanto, torna a preocupação constitutiva?
+
+A verificação formal oferece outro ponto de contato. Ying~\cite{hoare_quantum} desenvolve uma lógica de Floyd--Hoare para correção parcial e total de programas quânticos, baseada em predicados quânticos e em pré-condições mais fracas. A formulação citada não incorpora o modelo contextual de ruído e as restrições de \textit{hardware} representados por $B$ e $\eta_B$ na Definição~\ref{def:constitutive-concern}.
+
+Esses trabalhos atuam em níveis complementares: os catálogos de padrões estruturam algoritmos e aplicações; AspectJulia modulariza preocupações transversais; Mitiq e Qermit modularizam procedimentos de mitigação; e a lógica de Floyd--Hoare formaliza propriedades de correção de programas quânticos. Este trabalho relaciona essas dimensões ao classificar preocupações transversais segundo o efeito de sua remoção sobre a executabilidade e a validade contextual.
+
+% ============================================================
+\section{Agenda de Pesquisa e Conclusão}
+\label{sec:conclusion}
+% ============================================================
+
+O conceito de preocupação constitutiva e a análise de composição da Seção~\ref{sec:composition} motivam quatro linhas de investigação.
+
+A primeira é a \textbf{formalização da semântica de composição}. A Seção~\ref{sec:composition} mostra que a ordem das transformações pode afetar a validade do resultado e que a presença e a precedência das preocupações constitutivas podem exigir verificações estáticas, dinâmicas ou híbridas. Uma formalização poderia estender a lógica de Hoare quântica examinada~\cite{hoare_quantum} para incorporar ruído e restrições de \textit{hardware}, além de definir uma álgebra de composição entre preocupações.
+
+A segunda é de \textbf{implementação}. Um \textit{framework} de decoradores constitutivos para kits de desenvolvimento de \textit{software} (\textit{Software Development Kits}, SDKs), como Qiskit e PennyLane, deveria (a)~verificar condições de executabilidade e combinar contratos, calibração ou evidência dinâmica para avaliar critérios de validade, (b)~impor restrições de precedência entre transformações e (c)~explorar combinações de \textit{backends} e estratégias de mitigação. Preocupações que geram múltiplas execuções, como ZNE, exigem uma semântica de tecimento capaz de representar cada execução e a agregação de seus resultados.
+
+A terceira é \textbf{empírica}. Com que frequência preocupações de execução aparecem misturadas à lógica algorítmica em \textit{software} quântico? A mineração de repositórios públicos poderia quantificar essa ocorrência e caracterizar suas formas. Entrevistas ou questionários poderiam investigar se os desenvolvedores percebem essa mistura como um problema de projeto e como procuram resolvê-la.
+
+A quarta é de \textbf{taxonomia}. As instâncias apresentadas sustentam duas categorias preliminares: constitutividade do resultado e constitutividade da executabilidade. Orçamento de \textit{shots}, configurações de execução e variação temporal do \textit{hardware} são candidatos a novas instâncias. Sua análise permitirá avaliar se as duas categorias são suficientes ou se a taxonomia precisa ser ampliada. Essa linha inclui investigar como determinar $\tau$ a partir de requisitos da aplicação, referências experimentais e incerteza estatística. Como a classificação depende desse limiar, diferentes critérios para estabelecê-lo podem alterar se uma preocupação é ortogonal ao critério ou constitutiva em determinado contexto. A classificação deve permanecer baseada na Definição~\ref{def:constitutive-concern}, e não apenas em semelhanças entre exemplos.
+
+\textbf{Escopo da avaliação.} A avaliação abrange duas instâncias da taxonomia em um ambiente reproduzível: ZNE sob um modelo de ruído derivado do \texttt{FakeFez} e adaptação para uma arquitetura supercondutora. As estimativas são condicionadas ao modelo, às sementes e ao número de \textit{shots}, e $\tau=0{,}97$ expressa o critério operacional do caso estudado. A distribuição $\mathcal{D}^*$ está disponível neste \textit{benchmark}; em tarefas nas quais ela é desconhecida, a avaliação de validade pode recorrer a critérios verificáveis, como propriedades parciais, limites analíticos ou evidência experimental. Esse desenho estabelece uma base reproduzível para ampliar a validação em \textit{hardware} ao vivo, em outras plataformas e com esses critérios.
+
+AOP oferece mecanismos para modularizar preocupações transversais. A classificação proposta acrescenta a distinção entre preocupações cuja remoção preserva a executabilidade e o critério de validade e aquelas cuja remoção os viola. Essa distinção é particularmente relevante na computação quântica, em que os resultados são probabilísticos e dependem das condições do \textit{hardware}. Neste trabalho, definimos preocupação constitutiva, ilustramos a definição com mitigação de erros e adaptação de \textit{backend} e analisamos sua composição com preocupações ortogonais. Esses resultados estabelecem a base conceitual para as linhas de investigação apresentadas nesta seção.
+
+\section*{Disponibilidade de Artefatos}
+A implementação modular dos exemplos de ZNE e adaptação de \textit{backend}, acompanhada de dependências fixadas, testes, resultados de referência e um \textit{notebook} executável, está disponível em \url{https://github.com/j3ffsilva/quantum-constitutive-concerns}. O artefato distingue o código executável da notação conceitual dos decoradores apresentada nas Listagens~\ref{lst:grover} a~\ref{lst:explore}.
+
+\bibliographystyle{ACM-Reference-Format}
+\bibliography{references}
+
+\end{document}
